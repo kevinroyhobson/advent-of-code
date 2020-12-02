@@ -1,8 +1,8 @@
 fun main() {
 
 
-    val day1 = Day1()
-    println(day1.puzzle1())
-    println(day1.puzzle2())
+    val today = Day2()
+    println(today.puzzle1())
+//    println(day1.puzzle2())
 
 }
