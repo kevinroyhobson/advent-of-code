@@ -14,7 +14,25 @@ class Day2 {
             val policy = PasswordPolicy(policyString)
             val password = passwordAndPolicy.split(':')[1].trim()
 
-            if (policy.isPasswordValid(password)) {
+            if (policy.isPasswordValidForPuzzle1(password)) {
+                validPasswords++
+            }
+        }
+
+        return validPasswords
+    }
+
+    fun puzzle2() : Int {
+
+        var validPasswords = 0
+        var passwordAndPolicyCombinations = File(_inputFilePath).readLines()
+
+        for (passwordAndPolicy in passwordAndPolicyCombinations) {
+            val policyString = passwordAndPolicy.split(':')[0]
+            val policy = PasswordPolicy(policyString)
+            val password = passwordAndPolicy.split(':')[1].trim()
+
+            if (policy.isPasswordValidForPuzzle2(password)) {
                 validPasswords++
             }
         }
@@ -24,11 +42,11 @@ class Day2 {
 }
 
 class PasswordPolicy(policyString: String) {
-    private val _minOccurrences: Int = policyString.split(' ')[0].split('-')[0].toInt()
-    private val _maxOccurrences: Int = policyString.split(' ')[0].split('-')[1].toInt()
+    private val _leftPolicyValue: Int = policyString.split(' ')[0].split('-')[0].toInt()
+    private val _rightPolicyValue: Int = policyString.split(' ')[0].split('-')[1].toInt()
     private val _theCharacterInQuestion: Char = policyString.split(' ')[1][0]
 
-    fun isPasswordValid(password: String) : Boolean {
+    fun isPasswordValidForPuzzle1(password: String) : Boolean {
 
         var numOccurrences = 0
         for (character in password) {
@@ -37,6 +55,12 @@ class PasswordPolicy(policyString: String) {
             }
         }
 
-        return numOccurrences in _minOccurrences.._maxOccurrences
+        return numOccurrences in _leftPolicyValue.._rightPolicyValue
+    }
+
+    fun isPasswordValidForPuzzle2(password: String) : Boolean {
+
+        return (password[_leftPolicyValue-1] == _theCharacterInQuestion) xor
+               (password[_rightPolicyValue-1] == _theCharacterInQuestion)
     }
 }
