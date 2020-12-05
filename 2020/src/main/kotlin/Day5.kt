@@ -1,5 +1,6 @@
 import java.io.File
 import kotlin.math.max
+import kotlin.math.min
 
 class Day5 {
 
@@ -17,6 +18,32 @@ class Day5 {
         }
 
         return maxSeatId
+    }
+
+    fun puzzle2() : Int {
+
+        var maxSeatNumber = puzzle1()
+        var isSeatTaken = Array<Boolean>(maxSeatNumber + 1) { false }
+
+        val seatCodes = File(_inputFilePath).readLines()
+        var minSeatNumber = Int.MAX_VALUE
+        for (seatCode in seatCodes) {
+
+            val seat = Seat(seatCode)
+            var thisSeatId = seat.getSeatId()
+            isSeatTaken[thisSeatId] = true
+
+            minSeatNumber = min(thisSeatId, minSeatNumber)
+        }
+
+        for (i in minSeatNumber..maxSeatNumber) {
+
+            if (!isSeatTaken[i]) {
+                return i
+            }
+        }
+
+        throw Exception("There are no empty seats on the plane.")
     }
 }
 
