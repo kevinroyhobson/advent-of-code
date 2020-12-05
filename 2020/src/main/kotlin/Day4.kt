@@ -2,7 +2,7 @@ import java.io.File
 
 class Day4 {
 
-    private val _inputFilePath = "input/2020-12-04_input-1.txt"
+    private val _inputFilePath = "input/2020-12-04.txt"
 
     fun thePuzzle(): Int {
 
@@ -126,6 +126,3 @@ class Passport {
     }
     private val _passportIdRegex = Regex("[0-9]{9}")
 }
-
-
-

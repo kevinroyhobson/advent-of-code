@@ -2,7 +2,7 @@ import java.io.File
 
 class Day2 {
 
-    private val _inputFilePath = "input/2020-12-02_input-1.txt"
+    private val _inputFilePath = "input/2020-12-02.txt"
 
     fun puzzle1() : Int {
 
