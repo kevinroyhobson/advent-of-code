@@ -1,23 +1,21 @@
 import java.io.File
-import kotlin.math.max
-import kotlin.math.min
 
 class Day9 {
 
     private val _inputFilePath = "input/2020-12-09.txt"
-    private val windowWidth = 25
+    private val _windowWidth = 25
 
     fun puzzle1() : Long {
 
         val input = File(_inputFilePath).readLines()
-                                           .map { it.toLong() }
-                                           .toLongArray()
+                                        .map { it.toLong() }
+                                        .toLongArray()
 
-        var indexToCheck = windowWidth
+        var indexToCheck = _windowWidth
         while (indexToCheck < input.count()) {
 
             val numberToCheck = input[indexToCheck]
-            val subsetToCheck = input.copyOfRange(indexToCheck - windowWidth, indexToCheck)
+            val subsetToCheck = input.copyOfRange(indexToCheck - _windowWidth, indexToCheck)
             if (!isNumberSumOfTwoOtherNumbers(numberToCheck, subsetToCheck)) {
                 return numberToCheck
             }
@@ -33,7 +31,7 @@ class Day9 {
         val targetSum = puzzle1()
 
         val input = File(_inputFilePath).readLines()
-                                           .map { it.toLong() }
+                                        .map { it.toLong() }
 
         var leftWindowIndex = 0
         var rightWindowIndex = 0
