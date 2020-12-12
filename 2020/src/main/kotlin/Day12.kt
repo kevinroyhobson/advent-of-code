@@ -5,83 +5,66 @@ class Day12 {
 
     private val _inputFilePath = "input/2020-12-12.txt"
 
-    private var _x = 0
-    private var _y = 0
-    private var _facingDegrees = 90
+    private var _shipX = 0
+    private var _shipY = 0
+
+    private var _waypointX = 10
+    private var _waypointY = 1
 
     fun puzzle1() : Int {
 
         var input = File(_inputFilePath).readLines()
-        for (line in input) {
-            processAction(line)
+        for (instruction in input) {
+            processInstruction(instruction)
         }
 
-        return abs(_x) + abs(_y)
+        return abs(_shipX) + abs(_shipY)
     }
 
-    private fun processAction(inputLine: String) {
-        var action = inputLine.first()
-        var value = inputLine.substring(1).toInt()
+    private fun processInstruction(instruction: String) {
+        var action = instruction.first()
+        var value = instruction.substring(1).toInt()
 
         when (action) {
-            'N', 'E', 'S', 'W', 'F' -> {
-                var directionToMove = getDirectionByLetter(action)
-                move(directionToMove, value)
+            'N', 'E', 'S', 'W' -> {
+                moveWaypoint(action, value)
             }
+            'F' -> moveShipTowardWaypoint(value)
             'L', 'R' -> {
-                changeDirection(action, value)
+                rotateWaypoint(action, value)
             }
         }
     }
 
-    private fun move(direction: Direction, distance: Int) {
+    private fun moveWaypoint(direction: Char, distance: Int) {
         when (direction) {
-            Direction.North -> _y += distance
-            Direction.East -> _x += distance
-            Direction.South -> _y  -= distance
-            Direction.West -> _x -= distance
+            'N' -> _waypointY += distance
+            'E' -> _waypointX += distance
+            'S' -> _waypointY  -= distance
+            'W' -> _waypointX -= distance
         }
     }
 
-    private fun getDirectionByLetter(letter: Char) : Direction {
-        return when (letter) {
-            'N' -> Direction.North
-            'E' -> Direction.East
-            'S' -> Direction.South
-            'W' -> Direction.West
-            'F' -> getCurrentFacingDirection()
-            else -> throw Exception("invalid action")
+    private fun moveShipTowardWaypoint(waypointIncrements: Int) {
+        _shipX += _waypointX * waypointIncrements
+        _shipY += _waypointY * waypointIncrements
+    }
+
+    private fun rotateWaypoint(turnDirection: Char, degrees: Int) {
+
+        var timesToRotateClockwise = degrees / 90
+        if (turnDirection == 'L') {
+            timesToRotateClockwise = 4 - timesToRotateClockwise
+        }
+
+        for (i in 0 until timesToRotateClockwise) {
+            rotateWaypointClockwise()
         }
     }
 
-    private fun getCurrentFacingDirection() : Direction {
-        return when (_facingDegrees) {
-            0 -> Direction.North
-            90 -> Direction.East
-            180 -> Direction.South
-            270 -> Direction.West
-            else -> throw Exception("invalid direction")
-        }
+    private fun rotateWaypointClockwise() {
+        var newWaypointX = _waypointY
+        _waypointY = _waypointX * -1
+        _waypointX = newWaypointX
     }
-
-    private fun changeDirection(turnDirection: Char, degrees: Int) {
-
-        when (turnDirection) {
-            'R' -> _facingDegrees += degrees
-            'L' -> _facingDegrees -= degrees
-        }
-
-        if (_facingDegrees < 0) {
-            _facingDegrees += 360
-        }
-
-        _facingDegrees %= 360
-    }
-}
-
-enum class Direction {
-    North,
-    East,
-    South,
-    West
 }
