@@ -5,11 +5,12 @@ class Day11 {
     private val _inputFilePath = "input/2020-12-11.txt"
 
     private var _waitingAreaBoard = arrayOf(arrayOf<SeatStatus>())
+    private var _boardWidth = 0
+    private var _boardHeight = 0
 
+    fun thePuzzle() : Int {
 
-    fun puzzle1() : Int {
-
-        _waitingAreaBoard = loadInitialBoardFromInput()
+        loadInitialBoardFromInput()
         printBoard()
         println()
 
@@ -34,18 +35,20 @@ class Day11 {
         return getNumOccupiedSeats()
     }
 
-    private fun loadInitialBoardFromInput() : Array<Array<SeatStatus>> {
+    private fun loadInitialBoardFromInput() {
 
         var inputLines = File(_inputFilePath).readLines()
-        var boardWidth = inputLines[0].length
-        var emptyRowInput = ".".repeat(boardWidth)
+        var inputBoardWidth = inputLines[0].length
+        var emptyRowInput = ".".repeat(inputBoardWidth)
 
         var board = arrayListOf<Array<SeatStatus>>()
         board.add(initializeRowFromString(emptyRowInput))
         board.addAll(inputLines.map { initializeRowFromString(it) })
         board.add(initializeRowFromString(emptyRowInput))
 
-        return board.toTypedArray()
+        _waitingAreaBoard = board.toTypedArray()
+        _boardWidth = _waitingAreaBoard[0].count()
+        _boardHeight = _waitingAreaBoard.count()
     }
 
     private fun printBoard() {
@@ -73,9 +76,7 @@ class Day11 {
 
     private fun getNextBoard() : Array<Array<SeatStatus>> {
 
-        var width = _waitingAreaBoard[0].count()
-        var height = _waitingAreaBoard.count()
-        var nextBoard = Array(height) { Array<SeatStatus>(width) { SeatStatus.Floor } }
+        var nextBoard = Array(_boardHeight) { Array<SeatStatus>(_boardWidth) { SeatStatus.Floor } }
 
         for (x in 0 until nextBoard[0].count()) {
             for (y in 0 until nextBoard.count()) {
@@ -94,39 +95,63 @@ class Day11 {
             return SeatStatus.Floor
         }
 
-        var numOccupiedAdjacentSeats = getNumOccupiedSeatsAdjacentToLocation(x, y)
+        var numOccupiedAdjacentSeats = getNumOccupiedSeatsVisibleFromLocation(x, y)
 
         if (currentStatus == SeatStatus.EmptySeat && numOccupiedAdjacentSeats == 0) {
             return SeatStatus.OccupiedSeat
         }
 
-        if (currentStatus == SeatStatus.OccupiedSeat && numOccupiedAdjacentSeats >= 4) {
+        if (currentStatus == SeatStatus.OccupiedSeat && numOccupiedAdjacentSeats >= 5) {
             return SeatStatus.EmptySeat
         }
 
         return currentStatus
     }
 
-    private fun getNumOccupiedSeatsAdjacentToLocation(x: Int, y: Int) : Int {
+    private fun getNumOccupiedSeatsVisibleFromLocation(x: Int, y: Int) : Int {
 
-        var numOccupiedAdjacentSeats = 0
+        var numOccupiedVisibleSeats = 0
         for (i in -1..1) {
             for (j in -1..1) {
                 if (i == 0 && j == 0) { continue } // Do not count this location itself.
 
-                if (_waitingAreaBoard[y+i][x+j] == SeatStatus.OccupiedSeat) {
-                    numOccupiedAdjacentSeats++
+                if (isOccupiedSeatVisibleInDirection(x, y, i, j)) {
+                    numOccupiedVisibleSeats++
                 }
             }
         }
 
-        return numOccupiedAdjacentSeats
+        return numOccupiedVisibleSeats
+    }
+
+    private fun isOccupiedSeatVisibleInDirection(x: Int, y: Int, i: Int, j: Int) : Boolean {
+
+        var xToCheck = x + i
+        var yToCheck = y + j
+
+        while (xToCheck in 0 until _boardWidth && yToCheck in 0 until _boardHeight) {
+
+            var seatToCheck = _waitingAreaBoard[yToCheck][xToCheck]
+
+            if (seatToCheck == SeatStatus.OccupiedSeat) {
+                return true
+            }
+
+            if (seatToCheck == SeatStatus.EmptySeat) {
+                return false
+            }
+
+            xToCheck += i
+            yToCheck += j
+        }
+
+        return false
     }
 
     private fun isBoardIdentical(otherBoard: Array<Array<SeatStatus>>) : Boolean {
 
-        for (x in 0 until _waitingAreaBoard[0].count()) {
-            for (y in 0 until _waitingAreaBoard.count()) {
+        for (x in 0 until _boardWidth) {
+            for (y in 0 until _boardHeight) {
                 if (_waitingAreaBoard[y][x] != otherBoard[y][x]) {
                     return false
                 }
