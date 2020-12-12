@@ -1,4 +1,4 @@
 fun main() {
-    val today = Day11()
-    println(today.thePuzzle())
+    val today = Day12()
+    println(today.puzzle1())
 }
