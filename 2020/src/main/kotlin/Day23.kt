@@ -1,89 +1,79 @@
 class Day23 {
 
-    var _allCupsInOrder = arrayListOf<Int>(4, 6, 9, 2, 1, 7, 5, 3, 8)
-//    var _cupCount = 1000000
-    var _cupCount = 9
-    var _currentCupIndex = 0
-    var _currentCupValue = 0
-    var _destinationCupIndex = 0
-    var _pickedUpCupValues = arrayListOf<Int>()
+    private var _cupInput = arrayListOf<Int>(4, 6, 9, 2, 1, 7, 5, 3, 8)
 
-    fun thePuzzle() : Int {
+    fun thePuzzle(): Int {
 
-//        for (i in 10.._cupCount) {
-//            _allCupsInOrder.add(i)
-//        }
+        var cupsByValue = hashMapOf<Int, Cup>()
+
+        // Initialize the next cup in the circle for each cup
+        for (i in _cupInput.indices) {
+
+            var thisCup = Cup(_cupInput[i])
+            cupsByValue[_cupInput[i]] = thisCup
+
+            if (i > 0) {
+                var previousClockwiseCupValue = _cupInput[i - 1]
+                var previousCup = cupsByValue[previousClockwiseCupValue]!!
+                previousCup.nextClockwiseCup = thisCup
+            }
+        }
+
+        var firstCup = cupsByValue[_cupInput.first()]!!
+        var lastCup = cupsByValue[_cupInput.last()]!!
+        lastCup.nextClockwiseCup = firstCup
+
+
+        // Initialize the previous cup by value for each cup
+        for (i in 2.._cupInput.count()) {
+            var cupWithThisValue = cupsByValue[i]!!
+            var cupWithPreviousValue = cupsByValue[i - 1]!!
+            cupWithThisValue.previousCupByValue = cupWithPreviousValue
+        }
+
+        var minimumValueCup = cupsByValue[1]!!
+        var maximumValueCup = cupsByValue[_cupInput.count()]!!
+        minimumValueCup.previousCupByValue = maximumValueCup
+
+        var currentCup = cupsByValue[_cupInput.first()]!!
 
 //        for (i in 1..10000000) {
         for (i in 1..100) {
 
-            _currentCupValue = _allCupsInOrder[_currentCupIndex]
+            var pickedUpCup1 = currentCup.nextClockwiseCup!!
+            var pickedUpCup2 = pickedUpCup1.nextClockwiseCup!!
+            var pickedUpCup3 = pickedUpCup2.nextClockwiseCup!!
 
-            removePickedUpCups()
-            setDestinationCupIndex()
-            reinsertPickedUpCups()
+            var pickedUpValues = hashSetOf(pickedUpCup1.value, pickedUpCup2.value, pickedUpCup3.value)
 
-            var newCurrentCupIndex = _allCupsInOrder.indexOf(_currentCupValue)
-            _currentCupIndex = (newCurrentCupIndex + 1) % _cupCount
-
-            if (i % 1000 == 0) {
-                println("Processed $i moves.")
+            var destinationCup = currentCup.previousCupByValue!!
+            while (pickedUpValues.contains(destinationCup.value)) {
+                destinationCup = destinationCup.previousCupByValue!!
             }
 
-            println(_allCupsInOrder)
+            // Change the pointers to move the picked up cups
+            var newCupNextToCurrentCup = pickedUpCup3.nextClockwiseCup
+            pickedUpCup3.nextClockwiseCup = destinationCup.nextClockwiseCup
+            destinationCup.nextClockwiseCup = pickedUpCup1
+            currentCup.nextClockwiseCup = newCupNextToCurrentCup
 
+            // Set the next current cup
+            currentCup = currentCup.nextClockwiseCup!!
         }
 
-        var indexOfCupNumberOne = _allCupsInOrder.indexOf(1)
-        var cupAIndex = (indexOfCupNumberOne + 1) % _cupCount
-        var cupBIndex = (indexOfCupNumberOne + 2) % _cupCount
+        print("[ ")
+        for (i in 0 until _cupInput.count()) {
+            print("${currentCup.value} ")
+            currentCup = currentCup.nextClockwiseCup!!
+        }
+        println("]")
 
-        println(_allCupsInOrder)
-        println(indexOfCupNumberOne)
-        println(_allCupsInOrder[cupAIndex])
-        println(_allCupsInOrder[cupBIndex])
-
-        return _allCupsInOrder[cupAIndex] * _allCupsInOrder[cupBIndex]
+        var cupOne = cupsByValue[1]!!
+        return cupOne.nextClockwiseCup!!.value * cupOne.nextClockwiseCup!!.nextClockwiseCup!!.value
     }
+}
 
-    private fun removePickedUpCups() {
-
-        _pickedUpCupValues.clear()
-
-        var indexToRemoveAt = (_currentCupIndex + 1) % _cupCount
-        for (x in 0..2) {
-
-            var numRemainingCups = _cupCount - x
-            if (indexToRemoveAt >= numRemainingCups) {
-                indexToRemoveAt = 0
-            }
-
-            _pickedUpCupValues.add(_allCupsInOrder.removeAt(indexToRemoveAt))
-        }
-    }
-
-    private fun reinsertPickedUpCups() {
-        for (x in 0..2) {
-            _allCupsInOrder.add(_destinationCupIndex + 1 + x, _pickedUpCupValues[x])
-        }
-    }
-
-    private fun setDestinationCupIndex() {
-
-        var pickedUpCupValues = _pickedUpCupValues.toHashSet()
-
-        var destinationCupValue = _currentCupValue - 1
-        if (destinationCupValue == 0) {
-            destinationCupValue = _cupCount
-        }
-
-        while (pickedUpCupValues.contains(destinationCupValue)) {
-            destinationCupValue--
-            if (destinationCupValue == 0) {
-                destinationCupValue = _cupCount
-            }
-        }
-
-        _destinationCupIndex = _allCupsInOrder.indexOf(destinationCupValue)
-    }
+class Cup(val value: Int) {
+    var nextClockwiseCup: Cup? = null
+    var previousCupByValue: Cup? = null
 }
