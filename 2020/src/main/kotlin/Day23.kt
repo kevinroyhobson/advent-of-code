@@ -2,43 +2,42 @@ class Day23 {
 
     private var _cupInput = arrayListOf<Int>(4, 6, 9, 2, 1, 7, 5, 3, 8)
 
-    fun thePuzzle(): Int {
+    fun thePuzzle(): Long {
 
         var cupsByValue = hashMapOf<Int, Cup>()
 
         // Initialize the next cup in the circle for each cup
-        for (i in _cupInput.indices) {
+        for (i in 1..1000000) {
 
-            var thisCup = Cup(_cupInput[i])
-            cupsByValue[_cupInput[i]] = thisCup
+            var thisCupValue = if (i <= _cupInput.count()) _cupInput[i-1] else i
+            var thisCup = Cup(thisCupValue)
+            cupsByValue[thisCupValue] = thisCup
 
-            if (i > 0) {
-                var previousClockwiseCupValue = _cupInput[i - 1]
+            if (i > 1) {
+                var previousClockwiseCupValue = if (i <= _cupInput.count() + 1) _cupInput[i-2] else i-1
                 var previousCup = cupsByValue[previousClockwiseCupValue]!!
                 previousCup.nextClockwiseCup = thisCup
             }
         }
 
         var firstCup = cupsByValue[_cupInput.first()]!!
-        var lastCup = cupsByValue[_cupInput.last()]!!
+        var lastCup = cupsByValue[1000000]!!
         lastCup.nextClockwiseCup = firstCup
 
-
         // Initialize the previous cup by value for each cup
-        for (i in 2.._cupInput.count()) {
+        for (i in 2..1000000) {
             var cupWithThisValue = cupsByValue[i]!!
             var cupWithPreviousValue = cupsByValue[i - 1]!!
             cupWithThisValue.previousCupByValue = cupWithPreviousValue
         }
 
         var minimumValueCup = cupsByValue[1]!!
-        var maximumValueCup = cupsByValue[_cupInput.count()]!!
+        var maximumValueCup = cupsByValue[1000000]!!
         minimumValueCup.previousCupByValue = maximumValueCup
 
         var currentCup = cupsByValue[_cupInput.first()]!!
 
-//        for (i in 1..10000000) {
-        for (i in 1..100) {
+        for (i in 1..10000000) {
 
             var pickedUpCup1 = currentCup.nextClockwiseCup!!
             var pickedUpCup2 = pickedUpCup1.nextClockwiseCup!!
@@ -61,15 +60,12 @@ class Day23 {
             currentCup = currentCup.nextClockwiseCup!!
         }
 
-        print("[ ")
-        for (i in 0 until _cupInput.count()) {
-            print("${currentCup.value} ")
-            currentCup = currentCup.nextClockwiseCup!!
-        }
-        println("]")
-
         var cupOne = cupsByValue[1]!!
-        return cupOne.nextClockwiseCup!!.value * cupOne.nextClockwiseCup!!.nextClockwiseCup!!.value
+        println(cupOne.value)
+        println(cupOne.nextClockwiseCup!!.value)
+        println(cupOne.nextClockwiseCup!!.nextClockwiseCup!!.value)
+
+        return cupOne.nextClockwiseCup!!.value.toLong() * cupOne.nextClockwiseCup!!.nextClockwiseCup!!.value.toLong()
     }
 }
 
