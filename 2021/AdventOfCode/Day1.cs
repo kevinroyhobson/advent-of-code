@@ -24,5 +24,27 @@ namespace AdventOfCode
 
             return numIncreases;
         }
+
+        public int Puzzle2()
+        {
+            var depths = File.ReadLines(InputPath)
+                             .Select(int.Parse)
+                             .ToList();
+
+            int numSlidingWindowIncreases = 0;
+            int previousSlidingWindowSum = int.MaxValue;
+            for (int i = 2; i < depths.Count; i++)
+            {
+                int currentSlidingWindowSum = depths[i] + depths[i - 1] + depths[i - 2];
+                if (currentSlidingWindowSum > previousSlidingWindowSum)
+                {
+                    numSlidingWindowIncreases++;
+                }
+
+                previousSlidingWindowSum = currentSlidingWindowSum;
+            }
+
+            return numSlidingWindowIncreases;
+        }
     }
 }
