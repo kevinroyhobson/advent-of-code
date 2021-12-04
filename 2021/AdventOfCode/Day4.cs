@@ -19,16 +19,7 @@ namespace AdventOfCode
                                      .Select(int.Parse)
                                      .ToList();
 
-            var boards = new List<BingoBoard>();
-
-            input = input.Skip(2).ToList();
-            while (input.Any())
-            {
-                var nextBoardInput = input.Take(5);
-                boards.Add(new BingoBoard(nextBoardInput));
-
-                input = input.Skip(6).ToList();
-            }
+            var boards = GetBingoBoardsFromInput(input);
 
             var numbersDrawnSoFar = new HashSet<int>();
             for (int numNumbersDrawnSoFar = 0; numNumbersDrawnSoFar < numbersToDraw.Count; numNumbersDrawnSoFar++)
@@ -46,6 +37,52 @@ namespace AdventOfCode
             }
 
             return 0;
+        }
+
+        public int Puzzle2()
+        {
+            var input = File.ReadLines(InputPath)
+                            .ToList();
+
+            var numbersToDraw = input.First()
+                                     .Split(',')
+                                     .Select(int.Parse)
+                                     .ToList();
+
+            var boards = GetBingoBoardsFromInput(input);
+
+            var numbersDrawnSoFar = new HashSet<int>();
+            for (int numNumbersDrawnSoFar = 0; numNumbersDrawnSoFar < numbersToDraw.Count; numNumbersDrawnSoFar++)
+            {
+                int thisNumber = numbersToDraw[numNumbersDrawnSoFar];
+                numbersDrawnSoFar.Add(thisNumber);
+
+                if (boards.Count == 1 && boards.Single().DoesBoardWin(numbersDrawnSoFar))
+                {
+                    return boards.Single().GetBoardScore(numbersDrawnSoFar, thisNumber);
+                }
+
+                boards = boards.Where(board => !board.DoesBoardWin(numbersDrawnSoFar))
+                               .ToList();
+            }
+
+            return 0;
+        }
+        
+        private List<BingoBoard> GetBingoBoardsFromInput(List<string> input)
+        {
+            var boards = new List<BingoBoard>();
+
+            input = input.Skip(2).ToList();
+            while (input.Any())
+            {
+                var nextBoardInput = input.Take(5);
+                boards.Add(new BingoBoard(nextBoardInput));
+
+                input = input.Skip(6).ToList();
+            }
+
+            return boards;
         }
 
         private class BingoBoard
