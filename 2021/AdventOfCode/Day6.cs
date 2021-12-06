@@ -9,7 +9,7 @@ namespace AdventOfCode
     {
         private const string InputPath = "input/2021-12-06.txt";
 
-        public long Puzzle1()
+        public long ThePuzzle()
         {
             var initialFish = File.ReadAllText(InputPath)
                                   .Split(',')
@@ -21,7 +21,7 @@ namespace AdventOfCode
                 numFishByTimerValue[i] = initialFish.Count(fish => fish == i);
             }
 
-            for (int day = 0; day < 80; day++)
+            for (int day = 0; day < 256; day++)
             {
                 long[] nextNumFishByTimerValue = new long[9];
 
