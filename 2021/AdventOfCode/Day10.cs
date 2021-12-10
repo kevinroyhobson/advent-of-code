@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace AdventOfCode
 {
@@ -7,31 +8,26 @@ namespace AdventOfCode
     {
         private const string InputPath = "input/2021-12-10.txt";
 
-        private Dictionary<char, char> _closingCharacterByOpeningCharacter = new Dictionary<char, char> {
-            {'(', ')'},
-            {'[', ']'},
-            {'{', '}'},
-            {'<', '>'}
-        };
-
-        private Dictionary<char, int> _errorScoreByClosingCharacter = new Dictionary<char, int>
-        {
-            {')', 3},
-            {']', 57},
-            {'}', 1197},
-            {'>', 25137}
-        };
-
         public int Puzzle1()
         {
-            var input = File.ReadLines(InputPath);
+            return File.ReadLines(InputPath)
+                        .Select(line => new ChunkLine(line))
+                        .Sum(chunkLine => chunkLine.GetCorruptedLineScore());
+        }
 
-            int totalSyntaxErrorScore = 0;
-            
-            foreach (var line in input)
+        private class ChunkLine
+        {
+            private string _line;
+
+            public ChunkLine(string line)
+            {
+                _line = line;
+            }
+
+            public int GetCorruptedLineScore()
             {
                 var openingCharacterStack = new Stack<char>();
-                foreach (var character in line)
+                foreach (var character in _line)
                 {
                     if (_closingCharacterByOpeningCharacter.ContainsKey(character))
                     {
@@ -42,13 +38,29 @@ namespace AdventOfCode
                         var mostRecentOpeningCharacter = openingCharacterStack.Pop();
                         if (character != _closingCharacterByOpeningCharacter[mostRecentOpeningCharacter])
                         {
-                            totalSyntaxErrorScore += _errorScoreByClosingCharacter[character];
+                            return _errorScoreByClosingCharacter[character];
                         }
                     }
                 }
+
+                return 0;
             }
 
-            return totalSyntaxErrorScore;
+            private readonly Dictionary<char, char> _closingCharacterByOpeningCharacter = new()
+            {
+                {'(', ')'},
+                {'[', ']'},
+                {'{', '}'},
+                {'<', '>'}
+            };
+
+            private readonly Dictionary<char, int> _errorScoreByClosingCharacter = new()
+            {
+                {')', 3},
+                {']', 57},
+                {'}', 1197},
+                {'>', 25137}
+            };
         }
     }
 }
