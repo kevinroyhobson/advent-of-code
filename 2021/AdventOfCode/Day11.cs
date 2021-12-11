@@ -21,11 +21,25 @@ namespace AdventOfCode
             return grid.NumFlashesSoFar;
         }
 
+        public int Puzzle2()
+        {
+            var grid = new OctopusGrid(InputPath);
+            int step = 0;
+            while (grid.NumFlashesLastStep < 100)
+            {
+                grid.Step();
+                step++;
+            }
+
+            return step;
+        }
+
         private class OctopusGrid
         {
             private int[,] _theGrid;
             public int NumFlashesSoFar { get; private set; }
-            
+            public int NumFlashesLastStep { get; private set; }
+
             public OctopusGrid(string inputPath)
             {
                 _theGrid = new int[10, 10];
@@ -81,12 +95,14 @@ namespace AdventOfCode
                     }
                 }
 
+                NumFlashesLastStep = 0;
                 for (int x = 0; x < 10; x++)
                 {
                     for (int y = 0; y < 10; y++)
                     {
                         if (_theGrid[x, y] >= 10)
                         {
+                            NumFlashesLastStep++;
                             _theGrid[x, y] = 0;
                         }
                     }
