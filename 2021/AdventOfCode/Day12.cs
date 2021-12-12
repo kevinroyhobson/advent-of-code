@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace AdventOfCode
     {
         private const string InputPath = "input/2021-12-12.txt";
 
-        public int Puzzle1()
+        public int ThePuzzle()
         {
             var startCave = GetStartCaveFromInput();
             return GetNumPathsToEndFromCave(new List<Cave>(), startCave);
@@ -43,21 +44,46 @@ namespace AdventOfCode
                 return 1;
             }
             
-            var validNextCaves = cave.ConnectedCaves.Where(connectedCave => IsValidNextCave(pathSoFar, connectedCave));
             var nextPathSoFar = new List<Cave>(pathSoFar) { cave };
+            var validNextCaves = cave.ConnectedCaves.Where(connectedCave => IsValidNextCave(nextPathSoFar, connectedCave));
             return validNextCaves.Sum(nextCave => GetNumPathsToEndFromCave(nextPathSoFar, nextCave));
         }
 
         private bool IsValidNextCave(List<Cave> pathSoFar, Cave nextCave)
         {
-            return !pathSoFar.Any(cave => cave.Name == nextCave.Name && cave.IsSmallCave);
+            if (nextCave.Name == "start")
+            {
+                return false;
+            }
+
+            if (HasAnySmallCaveBeenVisitedTwice(pathSoFar))
+            {
+                return !pathSoFar.Any(cave => cave.Name == nextCave.Name && cave.IsSmallCave);
+            }
+
+            return true;
+        }
+
+        private bool HasAnySmallCaveBeenVisitedTwice(List<Cave> pathSoFar)
+        {
+            var visitedCaveNames = new HashSet<string>();
+            foreach (var cave in pathSoFar)
+            {
+                if (cave.IsSmallCave && visitedCaveNames.Contains(cave.Name))
+                {
+                    return true;
+                }
+                visitedCaveNames.Add(cave.Name);
+            }
+
+            return false;
         }
 
         private class Cave
         {
             public string Name { get; }
             public List<Cave> ConnectedCaves { get; }
-            public bool IsSmallCave => Name.All(ch => ch is >= 'a' and <= 'z');
+            public bool IsSmallCave => Name[0] is >= 'a' and <= 'z';
 
             public Cave(string name)
             {
