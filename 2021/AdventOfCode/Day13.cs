@@ -40,6 +40,39 @@ namespace AdventOfCode
 
             return numDots;
         }
+        
+        public void Puzzle2()
+        {
+            var points = File.ReadLines(InputPath)
+                             .Where(line => line != String.Empty)
+                             .Where(line => !line.StartsWith("fold"))
+                             .Select(line => Tuple.Create(int.Parse(line.Split(",")[0]), int.Parse(line.Split(",")[1])))
+                             .ToList();
+
+            var foldInstructions = File.ReadLines(InputPath)
+                                       .Where(line => line.StartsWith("fold"));
+
+            var paperGrid = new bool[points.Max(point => point.Item1) + 1, points.Max(point => point.Item2) + 1];
+            foreach (var point in points)
+            {
+                paperGrid[point.Item1, point.Item2] = true;
+            }
+
+            foreach (var foldInstruction in foldInstructions)
+            {
+                paperGrid = ApplyFold(foldInstruction, paperGrid);
+            }
+
+            for (int y = 0; y < paperGrid.GetLength(1); y++)
+            {
+                for (int x = 0; x < paperGrid.GetLength(0); x++)
+                {
+                    Console.Write(paperGrid[x, y] ? "#" : ".");
+
+                }
+                Console.WriteLine();
+            }
+        }
 
         private bool[,] ApplyFold(string foldInstruction, bool[,] paperGrid)
         {
@@ -66,6 +99,29 @@ namespace AdventOfCode
                         if (paperGrid[foldLine + i, y])
                         {
                             newGrid[foldLine - i, y] = true;
+                        }
+                    }
+                }
+            }
+
+            if (axis == "y")
+            {
+                newGrid = new bool[paperGrid.GetLength(0), foldLine];
+                for (int x = 0; x < paperGrid.GetLength(0); x++)
+                {
+                    for (int y = 0; y < foldLine; y++)
+                    {
+                        newGrid[x, y] = paperGrid[x, y];
+                    }
+                }
+
+                for (int x = 0; x < newGrid.GetLength(0); x++)
+                {
+                    for (int j = 0; foldLine + j < paperGrid.GetLength(1); j++)
+                    {
+                        if (paperGrid[x, foldLine + j])
+                        {
+                            newGrid[x, foldLine - j] = true;
                         }
                     }
                 }
