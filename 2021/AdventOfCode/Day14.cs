@@ -11,49 +11,95 @@ namespace AdventOfCode
 
         private Dictionary<string, string> _insertionCharacterByPair;
 
-        public int Puzzle1()
+        public long ThePuzzle(int stepsToExecute)
         {
-            var polymerState = File.ReadLines(InputPath).First();
-
+            var originalPolymerStateString = File.ReadLines(InputPath).First();
+            var polymerState = GetPolymerState(originalPolymerStateString);
+            
             _insertionCharacterByPair = File.ReadLines(InputPath)
                                             .Skip(2)
                                             .ToDictionary(line => line.Split("->", StringSplitOptions.TrimEntries)[0],
                                                           line => line.Split("->", StringSplitOptions.TrimEntries)[1]);
 
-            for (int step = 0; step < 10; step++)
+            for (int step = 0; step < stepsToExecute; step++)
             {
                 polymerState = GetNextPolymerState(polymerState);
+                Console.WriteLine($"Executed step {step + 1}");
             }
 
-            var countByCharacter = new Dictionary<char, int>();
-            for (int i = 0; i < polymerState.Length; i++)
+            var countByCharacter = new Dictionary<char, long>();
+            foreach (var pair in polymerState)
             {
-                if (!countByCharacter.ContainsKey(polymerState[i]))
+                if (!countByCharacter.ContainsKey(pair.Key[0]))
                 {
-                    countByCharacter[polymerState[i]] = 0;
+                    countByCharacter[pair.Key[0]] = 0;
                 }
 
-                countByCharacter[polymerState[i]]++;
+                if (!countByCharacter.ContainsKey(pair.Key[1]))
+                {
+                    countByCharacter[pair.Key[1]] = 0;
+                }
+
+                countByCharacter[pair.Key[0]] += pair.Value;
+                countByCharacter[pair.Key[1]] += pair.Value;
             }
 
-            var sortedCounts = countByCharacter.OrderByDescending(count => count.Value);
-            return sortedCounts.First().Value - sortedCounts.Last().Value;
+            // The first and last characters -- which will be the same in the original string and the final string,
+            // are the only characters which are not referenced twice in the dict representation of the polymer. So
+            // increment those characters and divide each character occurrence value by 2.
+            countByCharacter[originalPolymerStateString.First()]++;
+            countByCharacter[originalPolymerStateString.Last()]++;
+            var sortedCounts = countByCharacter.Select(count => count.Value / 2)
+                                               .OrderByDescending(count => count);
+            return sortedCounts.First() - sortedCounts.Last();
         }
 
-        private string GetNextPolymerState(string polymerState)
+        private Dictionary<string, long> GetPolymerState(string polymerStateString)
         {
-            string nextPolymerState = String.Empty;
-
-            for (int i = 0; i < polymerState.Length - 1; i++)
+            var polymerState = new Dictionary<string, long>();
+            for (int i = 0; i < polymerStateString.Length - 1; i++)
             {
-                string thisPair = polymerState.Substring(i, 2);
-                nextPolymerState += thisPair[0];
-                if (_insertionCharacterByPair.ContainsKey(thisPair))
+                var thisPair = polymerStateString.Substring(i, 2);
+                if (!polymerState.ContainsKey(thisPair))
                 {
-                    nextPolymerState += _insertionCharacterByPair[thisPair];
+                    polymerState[thisPair] = 0;
+                }
+                polymerState[thisPair]++;
+            }
+
+            return polymerState;
+        }
+
+        private Dictionary<string, long> GetNextPolymerState(Dictionary<string, long> polymerState)
+        {
+            var nextPolymerState = new Dictionary<string, long>();
+            
+            foreach (var currentPolymerPair in polymerState)
+            {
+                if (_insertionCharacterByPair.ContainsKey(currentPolymerPair.Key))
+                {
+                    var insertedCharacter = _insertionCharacterByPair[currentPolymerPair.Key];
+                    var newPair1 = currentPolymerPair.Key[0] + insertedCharacter;
+                    var newPair2 = insertedCharacter + currentPolymerPair.Key[1];
+
+                    if (!nextPolymerState.ContainsKey(newPair1))
+                    {
+                        nextPolymerState[newPair1] = 0;
+                    }
+
+                    if (!nextPolymerState.ContainsKey(newPair2))
+                    {
+                        nextPolymerState[newPair2] = 0;
+                    }
+                    
+                    nextPolymerState[newPair1] += currentPolymerPair.Value;
+                    nextPolymerState[newPair2] += currentPolymerPair.Value;
+                }
+                else
+                {
+                    nextPolymerState[currentPolymerPair.Key] = currentPolymerPair.Value;
                 }
             }
-            nextPolymerState += polymerState[^1];
 
             return nextPolymerState;
         }
