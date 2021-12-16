@@ -18,6 +18,16 @@ namespace AdventOfCode
             var packet = new Packet(binaryInput);
             return packet.GetVersionSum();
         }
+        
+        public long Puzzle2()
+        {
+            var binaryInputGroups = File.ReadAllText(InputPath)
+                                        .Select(GetBinaryStringForHexCharacter);
+            var binaryInput = string.Join("", binaryInputGroups);
+
+            var packet = new Packet(binaryInput);
+            return packet.GetValue();
+        }
 
         private class Packet
         {
@@ -104,6 +114,62 @@ namespace AdventOfCode
             {
                 int subPacketVersionSum = _subPackets?.Sum(p => p.GetVersionSum()) ?? 0;
                 return Version + subPacketVersionSum;
+            }
+
+            public long GetValue()
+            {
+                if (_packetTypeId == 0)
+                {
+                    return _subPackets.Sum(p => p.GetValue());
+                }
+                
+                if (_packetTypeId == 1)
+                {
+                    long value = 1;
+                    foreach (var subPacket in _subPackets)
+                    {
+                        value *= subPacket.GetValue();
+                    }
+                    return value;
+                }
+                
+                if (_packetTypeId == 2)
+                {
+                    return _subPackets.Min(p => p.GetValue());
+                }
+
+                if (_packetTypeId == 3)
+                {
+                    return _subPackets.Max(p => p.GetValue());
+                }
+
+                if (_packetTypeId == 4)
+                {
+                    return _literalValue;
+                }
+
+                if (_packetTypeId == 5)
+                {
+                    return _subPackets[0].GetValue() > _subPackets[1].GetValue()
+                               ? 1
+                               : 0;
+                }
+
+                if (_packetTypeId == 6)
+                {
+                    return _subPackets[0].GetValue() < _subPackets[1].GetValue()
+                               ? 1
+                               : 0;
+                }
+
+                if (_packetTypeId == 7)
+                {
+                    return _subPackets[0].GetValue() == _subPackets[1].GetValue()
+                               ? 1
+                               : 0;
+                }
+
+                throw new ApplicationException("unknown packet id type");
             }
         }
         
