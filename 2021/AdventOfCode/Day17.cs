@@ -22,6 +22,20 @@ namespace AdventOfCode
             return trajectoriesToTry.Where(probe => probe.DoesProbePassThroughTargetArea())
                                     .Max(probe => probe.GetMaxHeight());
         }
+        
+        public int Puzzle2()
+        {
+            var trajectoriesToTry = new List<ProbeTrajectory>();
+            for (int x = 1; x < 200; x++)
+            {
+                for (int y = -176; y < 200; y++)
+                {
+                    trajectoriesToTry.Add(new ProbeTrajectory(x, y));
+                }
+            }
+
+            return trajectoriesToTry.Count(probe => probe.DoesProbePassThroughTargetArea());
+        }
 
         private class ProbeTrajectory
         {
