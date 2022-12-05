@@ -10,6 +10,13 @@ public class Day4
                    .Select(line => new CleaningPair(line))
                    .Count(IsAnyRangeFullyContained);
     }
+    
+    public int Puzzle2()
+    {
+        return File.ReadAllLines(InputPath)
+                   .Select(line => new CleaningPair(line))
+                   .Count(DoRangesOverlap);
+    }
 
     private class CleaningPair
     {
@@ -41,5 +48,18 @@ public class Day4
     {
         return cleaningPair.Elf1.Start <= cleaningPair.Elf2.Start && cleaningPair.Elf1.End >= cleaningPair.Elf2.End ||
                cleaningPair.Elf2.Start <= cleaningPair.Elf1.Start && cleaningPair.Elf2.End >= cleaningPair.Elf1.End;
+    }
+
+    private bool DoRangesOverlap(CleaningPair cleaningPair)
+    {
+        return IsPointInRange(cleaningPair.Elf1.Start, cleaningPair.Elf2) ||
+               IsPointInRange(cleaningPair.Elf1.End, cleaningPair.Elf2) ||
+               IsPointInRange(cleaningPair.Elf2.Start, cleaningPair.Elf1) ||
+               IsPointInRange(cleaningPair.Elf2.End, cleaningPair.Elf1);
+    }
+
+    private bool IsPointInRange(int point, CleaningRange range)
+    {
+        return point >= range.Start && point <= range.End;
     }
 }
