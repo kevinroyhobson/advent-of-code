@@ -8,23 +8,37 @@ public class Day5
     
     public string Puzzle1()
     {
+        (var initialInput, var instructions) = GetInputSections();
+        InitStacks(initialInput.ToList());
+        
+        foreach (var instruction in instructions)
+        {
+            ApplyInstructionAccordingToPuzzle1(instruction);
+        }
+
+        return GetTopOfEachStack();
+    }
+    
+    public string Puzzle2()
+    {
+        (var initialInput, var instructions) = GetInputSections();
+        InitStacks(initialInput.ToList());
+        
+        foreach (var instruction in instructions)
+        {
+            ApplyInstructionAccordingToPuzzle2(instruction);
+        }
+
+        return GetTopOfEachStack();
+    }
+
+    private (IEnumerable<string>, IEnumerable<string>) GetInputSections()
+    {
         var lines = File.ReadAllLines(InputPath);
         var initialInput = lines.Where(l => !l.StartsWith("move") && !l.IsNullOrEmpty());
         var instructions = lines.Where(l => l.StartsWith("move"));
 
-        InitStacks(initialInput.ToList());
-        foreach (var instruction in instructions)
-        {
-            ApplyInstruction(instruction);
-        }
-
-        var result = string.Empty;
-        for (int i = 1; i <= _stacks.Count(); i++)
-        {
-            result += _stacks[i].Pop();
-        }
-
-        return result;
+        return (initialInput, instructions);
     }
 
 
@@ -61,12 +75,9 @@ public class Day5
         return 1 + (stackNumber - 1) * 4;
     }
 
-    private void ApplyInstruction(string instruction)
+    private void ApplyInstructionAccordingToPuzzle1(string instruction)
     {
-        var instructionTokens = instruction.Split();
-        var numToMove = int.Parse(instructionTokens[1]);
-        var fromStack = int.Parse(instructionTokens[3]);
-        var toStack = int.Parse(instructionTokens[5]);
+        (int numToMove, int fromStack, int toStack) = GetInstructionTokens(instruction);
         
         for (int i = 0; i < numToMove; i++)
         {
@@ -74,5 +85,39 @@ public class Day5
         }
     }
     
-    
+    private void ApplyInstructionAccordingToPuzzle2(string instruction)
+    {
+        (int numToMove, int fromStack, int toStack) = GetInstructionTokens(instruction);
+        
+        var tempStack = new Stack<char>();
+        for (int i = 0; i < numToMove; i++)
+        {
+            tempStack.Push(_stacks[fromStack].Pop());
+        }
+
+        while (tempStack.Any())
+        {
+            _stacks[toStack].Push(tempStack.Pop());
+        }
+    }
+
+    private (int, int, int) GetInstructionTokens(string instruction)
+    {
+        var instructionTokens = instruction.Split();
+        var numToMove = int.Parse(instructionTokens[1]);
+        var fromStack = int.Parse(instructionTokens[3]);
+        var toStack = int.Parse(instructionTokens[5]);
+        return (numToMove, fromStack, toStack);
+    }
+
+    private string GetTopOfEachStack()
+    {
+        var result = string.Empty;
+        for (int i = 1; i <= _stacks.Count(); i++)
+        {
+            result += _stacks[i].Pop();
+        }
+
+        return result;
+    }
 }
