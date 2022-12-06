@@ -5,11 +5,13 @@ public class Day6
     private const string InputPath = "input/2022-12-06.txt";
 
     private string _input;
+    private int _bufferSize = 0;
     private string _buffer = "";
     private int _inputProcessIndex = 0;
     
-    public int Puzzle1()
+    public int FindStartMarkerIndex(int markerLength)
     {
+        _bufferSize = markerLength;
         _input = File.ReadAllText(InputPath);
         while (!IsBufferAMarker())
         {
@@ -24,7 +26,7 @@ public class Day6
         _buffer += _input[_inputProcessIndex];
         _inputProcessIndex++;
 
-        if (_buffer.Length > 4)
+        if (_buffer.Length > _bufferSize)
         {
             _buffer = _buffer[1..];
         }
@@ -32,6 +34,6 @@ public class Day6
 
     private bool IsBufferAMarker()
     {
-        return _buffer.Distinct().Count() == 4;
+        return _buffer.Distinct().Count() == _bufferSize;
     }
 }
