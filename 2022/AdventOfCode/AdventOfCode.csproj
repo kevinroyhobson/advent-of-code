@@ -20,10 +20,21 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="input\2022-12-01.txt" />
-      <Content Include="input\2022-12-02.txt" />
-      <Content Include="input\2022-12-03.txt" />
-      <Content Include="input\2022-12-04.txt" />
+      <Content Include="input\2022-12-01.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="input\2022-12-02.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="input\2022-12-03.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="input\2022-12-04.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="input\2022-12-05.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

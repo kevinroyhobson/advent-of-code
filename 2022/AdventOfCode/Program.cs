@@ -1,4 +1,4 @@
 ﻿using AdventOfCode;
 
-Console.WriteLine(new Day4().Puzzle1());
-Console.WriteLine(new Day4().Puzzle2());
+Console.WriteLine(new Day5().Puzzle1());
+// Console.WriteLine(new Day5().Puzzle2());
