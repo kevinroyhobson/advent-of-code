@@ -9,6 +9,27 @@ public class Day7
     
     public int Puzzle1()
     {
+        InitializeDirectoryStructure();
+        GetSize(_rootDirectory);
+        
+        return _allDirectorySizes.Where(size => size < 100000).Sum();
+    }
+
+    public int Puzzle2()
+    {
+        int totalSpace = 70000000;
+        int spaceRequired = 30000000;
+        
+        InitializeDirectoryStructure();
+        var usedSpace = GetSize(_rootDirectory);
+        int availableSpace = totalSpace - usedSpace;
+        int newSpaceNeeded = spaceRequired - availableSpace;
+        
+        return _allDirectorySizes.Where(size => size >= newSpaceNeeded).Min();
+    }
+    
+    private void InitializeDirectoryStructure() 
+    {
         _rootDirectory = new Directory("/", null);
         _currentDirectory = _rootDirectory;
         _inputQueue = new Queue<string>();
@@ -35,9 +56,6 @@ public class Day7
                 ProcessListOutput(listOutput);
             }
         }
-
-        var directorySizes = GetAllDirectorySizes();
-        return directorySizes.Where(size => size < 100000).Sum();
     }
 
     private class Directory
@@ -107,16 +125,7 @@ public class Day7
         };
     }
 
-    private IEnumerable<int> GetAllDirectorySizes()
-    {
-        _directorySizes = new List<int>();
-        GetSize(_rootDirectory);
-
-        return _directorySizes;
-    }
-
-    private List<int> _directorySizes;
-
+    private List<int> _allDirectorySizes = new List<int>();
     private int GetSize(Directory directory)
     {
         var size = directory.FileSizeByName.Values.Sum();
@@ -124,7 +133,7 @@ public class Day7
         {
             size += GetSize(childDirectory);
         }
-        _directorySizes.Add(size);
+        _allDirectorySizes.Add(size);
         return size;
     }
 }
