@@ -1,4 +1,4 @@
 ﻿using AdventOfCode;
 
-Console.WriteLine(new Day6().FindStartMarkerIndex(4));
-Console.WriteLine(new Day6().FindStartMarkerIndex(14));
+Console.WriteLine(new Day7().Puzzle1());
+// Console.WriteLine(new Day7().Puzzle2());
