@@ -3,55 +3,115 @@ namespace AdventOfCode;
 public class Day8
 {
     private const string InputPath = "input/2022-12-08.txt";
-
+    private Tree[][] _trees;
+    
+    
     public int Puzzle1()
     {
-        var treeArray = File.ReadAllLines(InputPath)
+        _trees = File.ReadAllLines(InputPath)
                             .Select(line => line.Select(c => new Tree(int.Parse(c.ToString()))).ToArray())
                             .ToArray();
         
-        for (int x = 1; x < treeArray.Length - 1; x++)
+        for (int x = 1; x < _trees.Length - 1; x++)
         {
-            for (int y = 1; y < treeArray[x].Length - 1; y++)
+            for (int y = 1; y < _trees[x].Length - 1; y++)
             {
-                var leftTree = treeArray[x][y-1];
-                treeArray[x][y].MaxHeightByDirection[Direction.Left] =
+                var leftTree = _trees[x][y-1];
+                _trees[x][y].MaxHeightByDirection[Direction.Left] =
                     Math.Max(leftTree.MaxHeightByDirection[Direction.Left], leftTree.Height);
 
-                var upTree = treeArray[x-1][y];
-                treeArray[x][y].MaxHeightByDirection[Direction.Up] =
+                var upTree = _trees[x-1][y];
+                _trees[x][y].MaxHeightByDirection[Direction.Up] =
                     Math.Max(upTree.MaxHeightByDirection[Direction.Up], upTree.Height);
             }
         }
         
-        for (int x = treeArray.Length - 2; x > 0; x--)
+        for (int x = _trees.Length - 2; x > 0; x--)
         {
-            for (int y = treeArray[x].Length - 2; y > 0; y--)
+            for (int y = _trees[x].Length - 2; y > 0; y--)
             {
-                var rightTree = treeArray[x][y+1];
-                treeArray[x][y].MaxHeightByDirection[Direction.Right] =
+                var rightTree = _trees[x][y+1];
+                _trees[x][y].MaxHeightByDirection[Direction.Right] =
                     Math.Max(rightTree.MaxHeightByDirection[Direction.Right], rightTree.Height);
 
-                var downTree = treeArray[x+1][y];
-                treeArray[x][y].MaxHeightByDirection[Direction.Down] =
+                var downTree = _trees[x+1][y];
+                _trees[x][y].MaxHeightByDirection[Direction.Down] =
                     Math.Max(downTree.MaxHeightByDirection[Direction.Down], downTree.Height);
             }
         }
         
-        PrintTrees(treeArray);
-        return treeArray.SelectMany(row => row.Select(tree => tree))
+        return _trees.SelectMany(row => row.Select(tree => tree))
                         .Count(tree => tree.IsVisible);
     }
 
-    private void PrintTrees(Tree[][] treeArray)
+    public int Puzzle2()
     {
-        for (int x = 0; x < treeArray.Length; x++)
+        _trees = File.ReadAllLines(InputPath)
+                     .Select(line => line.Select(c => new Tree(int.Parse(c.ToString()))).ToArray())
+                     .ToArray();
+
+        int maxScenicScore = 0;
+        for (int x = 0; x < _trees.Length; x++)
         {
-            for (int y = 0; y < treeArray[x].Length; y++)
+            for (int y = 0; y < _trees[x].Length; y++)
+            {
+                int viewableTreesUp = 0;
+                for (int i = x - 1; i >= 0; i--)
+                {
+                    viewableTreesUp++;
+                    if (_trees[i][y].Height >= _trees[x][y].Height)
+                    {
+                        break;
+                    }
+                }
+
+                int viewableTreesDown = 0;
+                for (int i = x + 1; i < _trees.Length; i++)
+                {
+                    viewableTreesDown++;
+                    if (_trees[i][y].Height >= _trees[x][y].Height)
+                    {
+                        break;
+                    }
+                }
+                
+                int viewableTreesLeft = 0;
+                for (int j = y - 1; j >= 0; j--)
+                {
+                    viewableTreesLeft++;
+                    if (_trees[x][j].Height >= _trees[x][y].Height)
+                    {
+                        break;
+                    }
+                }
+                
+                int viewableTreesRight = 0;
+                for (int j = y + 1; j < _trees[x].Length; j++)
+                {
+                    viewableTreesRight++;
+                    if (_trees[x][j].Height >= _trees[x][y].Height)
+                    {
+                        break;
+                    }
+                }
+
+                int thisScenicScore = viewableTreesUp * viewableTreesDown * viewableTreesLeft * viewableTreesRight;
+                maxScenicScore = Math.Max(maxScenicScore, thisScenicScore);
+            }
+        }
+
+        return maxScenicScore;
+    }
+
+    private void PrintTrees()
+    {
+        for (int x = 0; x < _trees.Length; x++)
+        {
+            for (int y = 0; y < _trees[x].Length; y++)
             {
                 // Console.Write(treeArray[x][y].Height;
                 // Console.Write(treeArray[x][y].MaxHeightByDirection[Direction.Left]);
-                Console.Write(treeArray[x][y].IsVisible ? "X" : "O");
+                Console.Write(_trees[x][y].IsVisible ? "X" : "O");
             }
             Console.WriteLine();
         }
