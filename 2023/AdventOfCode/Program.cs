@@ -1,3 +1,3 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-Console.WriteLine(new Day1().Puzzle1());
+Console.WriteLine(new Day1().ThePuzzle());
