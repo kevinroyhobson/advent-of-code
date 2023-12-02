@@ -11,27 +11,33 @@ public class Day2
             .Select(GetGameId)
             .Sum();
     }
+    
+    public int Puzzle2()
+    {
+        return File.ReadAllLines(InputPath)
+            .Select(GetGamePower)
+            .Sum();
+    }
 
     private bool IsGamePossible(string game)
     {
-        var revealedCubeSets = game.Split(':')[1].Split(';');
-        foreach (var revealedCubeSet in revealedCubeSets)
-        {
-            var revealedCubes = new RevealedCubes(revealedCubeSet);
-            if (revealedCubes.GetCubeCount(CubeColor.Red) > 12 ||
-                revealedCubes.GetCubeCount(CubeColor.Green) > 13 ||
-                revealedCubes.GetCubeCount(CubeColor.Blue) > 14)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        var revealedCubes = new RevealedCubes(game);
+        return revealedCubes.GetMaximumSeenCount(CubeColor.Red) <= 12 &&
+               revealedCubes.GetMaximumSeenCount(CubeColor.Green) <= 13 &&
+               revealedCubes.GetMaximumSeenCount(CubeColor.Blue) <= 14;
     }
 
     private int GetGameId(string game)
     {
         return Int32.Parse(game.Split(':')[0].Replace("Game ", string.Empty));
+    }
+
+    private int GetGamePower(string game)
+    {
+        var revealedCubes = new RevealedCubes(game);
+        return revealedCubes.GetMaximumSeenCount(CubeColor.Red) *
+               revealedCubes.GetMaximumSeenCount(CubeColor.Green) *
+               revealedCubes.GetMaximumSeenCount(CubeColor.Blue);
     }
     
     private enum CubeColor
@@ -43,23 +49,24 @@ public class Day2
     
     private class RevealedCubes
     {
-        private Dictionary<CubeColor, int> _cubeCountByColor = new();
+        private Dictionary<CubeColor, int> _maxCubesSeenByColor = new();
         
-        public RevealedCubes(string revealed)
+        public RevealedCubes(string game)
         {
-            var cubeColorCounts = revealed.Split(',', StringSplitOptions.TrimEntries);
+            var cubeColorCounts = game.Split(':')[1].Split(new [] {',', ';'}, StringSplitOptions.TrimEntries);
             foreach (var cubeColorCount in cubeColorCounts)
             {
                 var tokens = cubeColorCount.Split(' ');
                 var count = Int32.Parse(tokens[0]);
                 var color = Enum.Parse<CubeColor>(tokens[1], true);
-                _cubeCountByColor[color] = count;
+                
+                _maxCubesSeenByColor[color] = int.Max(count, _maxCubesSeenByColor.GetValueOrDefault(color));
             }
         }
         
-        public int GetCubeCount(CubeColor color)
+        public int GetMaximumSeenCount(CubeColor color)
         {
-            return _cubeCountByColor.GetValueOrDefault(color);
+            return _maxCubesSeenByColor.GetValueOrDefault(color);
         }
     }
 }
