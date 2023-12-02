@@ -1,3 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-Console.WriteLine(new Day1().ThePuzzle());
+using AdventOfCode;
+
+Console.WriteLine(new Day2().Puzzle1());

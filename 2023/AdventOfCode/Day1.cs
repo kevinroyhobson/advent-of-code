@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿namespace AdventOfCode;
 
 public class Day1
 {
@@ -11,7 +11,7 @@ public class Day1
             .Sum();
     }
 
-    private Dictionary<string, int> _numberStrings = new Dictionary<string, int>()
+    private readonly Dictionary<string, int> _numberStrings = new()
     {
         {"1", 1},
         {"2", 2},
