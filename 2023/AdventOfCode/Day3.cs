@@ -63,6 +63,70 @@ public class Day3
         
         return adjacentCoordinates.Any(IsSymbol) ? number : 0;
     }
+
+    public int Puzzle2()
+    {
+        int gearRatioSum = 0;
+        
+        for (int y = 0; y < _schematic.Length; y++)
+        {
+            for (int x = 0; x < _schematic[y].Length; x++)
+            {
+                var coordinate = new Coordinate(x, y);
+                if (GetCharAt(coordinate) == '*')
+                {
+                    gearRatioSum += ComputeGearRatio(coordinate);
+                }
+            }
+        }
+
+        return gearRatioSum;
+    }
+    
+    private int ComputeGearRatio(Coordinate asteriskCoordinate)
+    {
+        var adjacentPartNumbers = new List<int>();
+        _visitedCoordinates.Clear();
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                var adjacentCoordinate = new Coordinate(asteriskCoordinate.X + i, asteriskCoordinate.Y + j);
+                if (IsValidCoordinate(adjacentCoordinate) && 
+                    !_visitedCoordinates.Contains(adjacentCoordinate) &&
+                    Char.IsDigit(GetCharAt(adjacentCoordinate)))
+                {
+                    adjacentPartNumbers.Add(ExpandIntAt(adjacentCoordinate));
+                }
+            }
+        }
+        
+        return adjacentPartNumbers.Count == 2 ? adjacentPartNumbers[0] * adjacentPartNumbers[1] : 0;
+    }
+    
+    private int ExpandIntAt(Coordinate coordinate)
+    {
+        var numberString = GetCharAt(coordinate).ToString();
+        _visitedCoordinates.Add(coordinate);
+
+        var expandedCoordinate = new Coordinate(coordinate.X - 1, coordinate.Y);
+        while (IsValidCoordinate(expandedCoordinate) && Char.IsDigit(GetCharAt(expandedCoordinate)))
+        {
+            numberString = GetCharAt(expandedCoordinate) + numberString;
+            _visitedCoordinates.Add(expandedCoordinate);
+            expandedCoordinate = new Coordinate(expandedCoordinate.X - 1, expandedCoordinate.Y);
+        }
+        
+        expandedCoordinate = new Coordinate(coordinate.X + 1, coordinate.Y);
+        while (IsValidCoordinate(expandedCoordinate) && Char.IsDigit(GetCharAt(expandedCoordinate)))
+        {
+            numberString += GetCharAt(expandedCoordinate);
+            _visitedCoordinates.Add(expandedCoordinate);
+            expandedCoordinate = new Coordinate(expandedCoordinate.X + 1, expandedCoordinate.Y);
+        }
+
+        return Int32.Parse(numberString);
+    }
     
     private bool IsValidCoordinate(Coordinate coordinate)
     {
