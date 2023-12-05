@@ -17,6 +17,9 @@
       <Content Include="input\2023-12-03.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <Content Include="input\2023-12-05.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
       </ItemGroup>
 
 </Project>
