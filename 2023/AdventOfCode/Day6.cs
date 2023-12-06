@@ -28,4 +28,20 @@ public class Day6
 
         return retVal;
     }
+    
+    public long Puzzle2()
+    {
+        var time = Int64.Parse(_inputLines[0]);
+        var distance = Int64.Parse(_inputLines[1]);
+
+        for (long t = 0; t <= time; t++)
+        {
+            if (t * (time - t) > distance)
+            {
+                return time - (2 * t) + 1;
+            }
+        }
+
+        throw new Exception("No time beats the distance.");
+    }
 }
