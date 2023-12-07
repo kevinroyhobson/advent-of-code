@@ -5,7 +5,7 @@ public class Day7
     private const string InputPath = "input/2023-12-07.txt";
     private List<string> _inputLines = File.ReadAllLines(InputPath).ToList();
     
-    public long Puzzle1()
+    public long ThePuzzle()
     {
         var hands = _inputLines.Select(inputLine => new CamelHand(inputLine))
                                .OrderBy(hand => hand.HandType)
@@ -45,7 +45,9 @@ public class Day7
                 numCardsByValue[card.Value] = numCardsByValue.GetValueOrDefault(card.Value) + 1;
             }
             
-            int maxMatchingCards = numCardsByValue.Values.Max();
+            numCardsByValue.Remove(1, out int numJokers);
+            int maxMatchingCards = numCardsByValue.Values.Any() ? numCardsByValue.Values.Max() : 0;
+            maxMatchingCards += numJokers;
             HandType = maxMatchingCards switch
             {
                 5 => HandType.FiveOfAKind,
@@ -70,7 +72,7 @@ public class Day7
                 'A' => 14,
                 'K' => 13,
                 'Q' => 12,
-                'J' => 11,
+                'J' => 1,
                 'T' => 10,
                 _ => label - '0'
             };    
