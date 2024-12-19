@@ -12,6 +12,14 @@ public class Day2
         return reports.Count(IsReportSafe);
     }
 
+    public int Puzzle2()
+    {
+        var reports = File.ReadAllLines(_inputPath)
+                          .Select(line => line.Split().Select(int.Parse));
+
+        return reports.Count(IsReportSafeWithDampener);
+    }
+
     private bool IsReportSafe(IEnumerable<int> report)
     {
         return (IsReportIncreasing(report) || IsReportDecreasing(report)) && GetMaxChange(report) <= 3;
@@ -33,5 +41,20 @@ public class Day2
     {
         var pairs = report.Zip(report.Skip(1), (current, next) => (current, next));
         return pairs.Max(pair => Math.Abs(pair.current - pair.next));
+    }
+
+    private bool IsReportSafeWithDampener(IEnumerable<int> report)
+    {
+        if (IsReportSafe(report))
+        {
+            return true;
+        }
+
+        var indexes = Enumerable.Range(0, report.Count());
+        return indexes.Any(i => {
+            var newReport = new List<int>(report);
+            newReport.RemoveAt(i);
+            return IsReportSafe(newReport);
+        });
     }
 }
