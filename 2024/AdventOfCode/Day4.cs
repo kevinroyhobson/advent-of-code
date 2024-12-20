@@ -57,4 +57,39 @@ public class Day4
         return _grid[y][x] == word[0] && IsWordMatch(word[1..], x + xDirection, y + yDirection, xDirection, yDirection);
     }
 
+    public int Puzzle2()
+    {
+        int numCrossmases = 0;
+        for (int x = 0; x < _grid[0].Length; x++)
+        {
+            for (int y = 0; y < _grid.Length; y++)
+            {
+                if (IsCrossmas(x, y))
+                {
+                    numCrossmases++;
+                }
+            }
+        }
+
+        return numCrossmases;
+    }
+
+    private bool IsCrossmas(int x, int y)
+    {
+        if (x <= 0 || x >= _grid[0].Length - 1 || y <= 0 || y >= _grid.Length - 1)
+        {
+            return false;
+        }
+
+        return _grid[y][x] == 'A' && 
+               _crossChars.Contains(_grid[y-1][x-1]) && 
+               _crossChars.Contains(_grid[y-1][x+1]) &&
+               _crossChars.Contains(_grid[y+1][x-1]) && 
+               _crossChars.Contains(_grid[y+1][x+1]) &&
+               _grid[y-1][x-1] != _grid[y+1][x+1] &&
+               _grid[y-1][x+1] != _grid[y+1][x-1];
+    }
+
+    private HashSet<char> _crossChars = new HashSet<char> {'M', 'S'};
+
 }
